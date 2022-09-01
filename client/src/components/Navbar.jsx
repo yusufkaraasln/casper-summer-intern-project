@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { Search, ShoppingCartOutlined } from "@mui/icons-material";
 import { Badge } from "@mui/material";
 import { Link } from "react-router-dom";
+
+import { useSelector } from "react-redux";
 const Container = styled.div`
   height: 60px;
 `;
@@ -38,9 +40,9 @@ const SearchContainer = styled.div`
 
 const Right = styled.div`
   flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 `;
 
 const Input = styled.input`
@@ -56,10 +58,15 @@ const Logo = styled.h1`
 const Auth = styled.div`
   font-size: 14px;
   cursor: pointer;
-    margin-left: 25px;
+  margin-left: 25px;
 `;
 
 function Navbar() {
+  const quantity = useSelector((state) => state.cart.quantity);
+  console.log(quantity);
+
+  
+
   return (
     <Container>
       <Wrapper>
@@ -67,21 +74,34 @@ function Navbar() {
           <Language>EN</Language>
           <SearchContainer>
             <Input />
-            <Search style={{color:"gray", fontSize:16}} />
+            <Search style={{ color: "gray", fontSize: 16 }} />
           </SearchContainer>
         </Left>
         <Center>
-         <Link style={{textDecoration: "none", color: "inherit"}} to="/">
-         <Logo>EXCALIBUR</Logo>
-         </Link>
+          <Link style={{ textDecoration: "none", color: "inherit" }} to="/">
+            <Logo>EXCALIBUR</Logo>
+          </Link>
         </Center>
         <Right>
-          <Auth>REGISTER</Auth>
+        <Link to={"/register"}>
+        
+        <Auth>REGISTER</Auth>
+
+
+        </Link>
+
+          <Link to={"/login"}>
           <Auth>LOGIN</Auth>
+          
+          </Link>
           <Auth>
-            <Badge badgeContent={4} color="primary">
-            <ShoppingCartOutlined />
+            <Link to={"/cart"}>
+            
+            <Badge badgeContent={quantity} color="primary">
+              <ShoppingCartOutlined />
             </Badge>
+            
+            </Link>
           </Auth>
         </Right>
       </Wrapper>

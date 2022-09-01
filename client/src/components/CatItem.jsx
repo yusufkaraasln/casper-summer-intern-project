@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 function CatItem({ item }) {
@@ -47,11 +48,13 @@ function CatItem({ item }) {
 
   return (
     <Container>
-      <Img src={item.img} />
+     <Link to={`/products/${item.cat}`}>
+     <Img src={item.img} />
       <Info>
         <Title>{item.title}</Title>
         <Button>DISCOVER NOW</Button>
       </Info>
+     </Link>
     </Container>
   );
 }

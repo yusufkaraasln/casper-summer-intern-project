@@ -1,9 +1,16 @@
 import { Add, Remove } from "@mui/icons-material";
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import Announcement from "../components/Announcement";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
+import { useSelector } from "react-redux";
+
+import StripeCheckout from "react-stripe-checkout";
+import { userRequest } from "../axiosRequest";
+import { useNavigate } from "react-router-dom";
+
+const KEY = process.env.REACT_APP_STRIPE;
 
 function Cart() {
   const Container = styled.div``;
@@ -24,8 +31,9 @@ function Cart() {
     padding: 10px;
     font-weight: 600;
     cursor: pointer;
-    border: ${(props) => props.type === "filled" ? "none" : "2px solid black"};
-    background: ${(props) => props.type === "filled" ? "#242526" : "#fff"};
+    border: ${(props) =>
+      props.type === "filled" ? "none" : "2px solid black"};
+    background: ${(props) => (props.type === "filled" ? "#242526" : "#fff")};
     color: ${(props) => props.type === "filled" && "white"};
   `;
 
@@ -100,7 +108,7 @@ function Cart() {
   `;
   const Summary = styled.div`
     flex: 1;
-    border: .5px solid lightgray;
+    border: 0.5px solid lightgray;
     border-radius: 10px;
     padding: 20px;
     height: fit-content;
@@ -108,7 +116,6 @@ function Cart() {
 
   const SummaryTitle = styled.h1`
     font-weight: 200;
-
   `;
   const SummaryItem = styled.div`
     margin: 30px 0;
@@ -116,20 +123,44 @@ function Cart() {
     justify-content: space-between;
     font-weight: ${(props) => props.type && "bold"};
     font-size: ${(props) => props.type && "24px"};
-
-
   `;
   const SummaryItemText = styled.span``;
   const SummaryItemPrice = styled.span``;
   const Button = styled.button`
-    
     width: 100%;
     padding: 10px;
     background: black;
     color: white;
-  
   `;
 
+  const cart = useSelector((state) => state.cart);
+  console.log(KEY);
+  const [stripeToken, setStripeToken] = React.useState(null);
+  const onToken = (token) => {
+    setStripeToken(token);
+  };
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const request = async () => {
+      try {
+        const res = await userRequest.post("/checkout/payment", {
+          tokenId: stripeToken.id,
+          amount: cart.total * 100,
+        });
+        navigate("/success", { replace: true }, {data: res.data} );
+      } catch (e) {
+        console.log(e);
+      }
+    };
+
+    stripeToken && request();
+
+
+  }, [stripeToken, cart.total, navigate]);
+
+  console.log(stripeToken);
   return (
     <Container>
       <Navbar />
@@ -146,94 +177,46 @@ function Cart() {
         </Top>
         <Bottom>
           <Info>
-            <Product>
-              <ProductDetail>
-                <Image src="https://www.casper.com.tr/uploads/2022/06/215-liste-gorseli_h270_op.webp" />
+            {cart.products.map((item) => (
+              <>
+                <Product>
+                  <ProductDetail>
+                    <Image src={item.img} />
 
-                <Details>
-                  <ProductName>
-                    <b>Product:</b> EXCALIBUR G900
-                  </ProductName>
-                  <ProductID>
-                    <b>ID:</b> 3463463823
-                  </ProductID>
-                  <ProductColor color="black" />
-                  <ProductRAM>
-                    <b>RAM:</b> 32GB
-                  </ProductRAM>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-                <ProductAmountContainer>
-                  <Remove />
-                  <ProductAmount>2</ProductAmount>
-                  <Add />
-                </ProductAmountContainer>
-                <ProductPrice>10.000 ₺</ProductPrice>
-              </PriceDetail>
-            </Product>
-            <Hr />
-            <Product>
-              <ProductDetail>
-                <Image src="https://www.casper.com.tr/uploads/2022/06/215-liste-gorseli_h270_op.webp" />
+                    <Details>
+                      <ProductName>
+                        <b>Product:</b> {item.title}
+                      </ProductName>
+                      <ProductID>
+                        <b>ID:</b> {item._id}
+                      </ProductID>
+                      <ProductColor color={item.color} />
+                      <ProductRAM>
+                        <b>RAM:</b> {item.ram}
+                      </ProductRAM>
+                    </Details>
+                  </ProductDetail>
+                  <PriceDetail>
+                    <ProductAmountContainer>
+                      <Remove />
+                      <ProductAmount>{item.quantity}</ProductAmount>
+                      <Add />
+                    </ProductAmountContainer>
+                    <ProductPrice>{item.price * item.quantity} ₺</ProductPrice>
+                  </PriceDetail>
+                </Product>
+                <Hr />
 
-                <Details>
-                  <ProductName>
-                    <b>Product:</b> EXCALIBUR G900
-                  </ProductName>
-                  <ProductID>
-                    <b>ID:</b> 3463463823
-                  </ProductID>
-                  <ProductColor color="black" />
-                  <ProductRAM>
-                    <b>RAM:</b> 32GB
-                  </ProductRAM>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-                <ProductAmountContainer>
-                  <Remove />
-                  <ProductAmount>2</ProductAmount>
-                  <Add />
-                </ProductAmountContainer>
-                <ProductPrice>10.000 ₺</ProductPrice>
-              </PriceDetail>
-            </Product>
-            <Hr />
-            <Product>
-              <ProductDetail>
-                <Image src="https://www.casper.com.tr/uploads/2022/06/215-liste-gorseli_h270_op.webp" />
-
-                <Details>
-                  <ProductName>
-                    <b>Product:</b> EXCALIBUR G900
-                  </ProductName>
-                  <ProductID>
-                    <b>ID:</b> 3463463823
-                  </ProductID>
-                  <ProductColor color="black" />
-                  <ProductRAM>
-                    <b>RAM:</b> 32GB
-                  </ProductRAM>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-                <ProductAmountContainer>
-                  <Remove />
-                  <ProductAmount>2</ProductAmount>
-                  <Add />
-                </ProductAmountContainer>
-                <ProductPrice>10.000 ₺</ProductPrice>
-              </PriceDetail>
-            </Product>
-            
+                <Hr />
+              </>
+            ))}
           </Info>
 
           <Summary>
             <SummaryTitle>ORDER SUMMARY</SummaryTitle>
             <SummaryItem>
               <SummaryItemText>Subtotal</SummaryItemText>
-              <SummaryItemPrice>12.200₺</SummaryItemPrice>
+              <SummaryItemPrice>{cart.total}₺</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>KDV</SummaryItemText>
@@ -244,10 +227,22 @@ function Cart() {
               <SummaryItemPrice>50₺</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem type="total">
-              <SummaryItemText >TOTAL</SummaryItemText>
-              <SummaryItemPrice>15.050₺</SummaryItemPrice>
+              <SummaryItemText>TOTAL</SummaryItemText>
+              <SummaryItemPrice>{cart.total}₺</SummaryItemPrice>
             </SummaryItem>
-          <Button>CHECKOUT NOW</Button>
+            <StripeCheckout
+              name="Excalibur Store"
+              image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcE6OEu9jYrrPaN64xI3lWaHhvDGsZCMLgOAn3tY_a&s"
+              billingAddress
+              shippingAddress
+              description={`Toplam tutar ${cart.total}₺`}
+              amount={cart.total * 100}
+              currency="TRY"
+              token={onToken}
+              stripeKey={KEY}
+            >
+              <Button>CHECKOUT NOW</Button>
+            </StripeCheckout>
           </Summary>
         </Bottom>
       </Wrapper>

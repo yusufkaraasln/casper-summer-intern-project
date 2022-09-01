@@ -1,3 +1,4 @@
+import { useLocation } from "react-router-dom";
 import React from "react";
 import styled from "styled-components";
 import Announcement from "../components/Announcement";
@@ -26,14 +27,26 @@ function ProductList() {
     margin-right: 20px;
   `;
   const Select = styled.select`
-
-        padding: 10px;
-        margin-right: 20px;
-        outline: none;
-
+    padding: 10px;
+    margin-right: 20px;
+    outline: none;
   `;
   const Option = styled.option``;
 
+  const location = useLocation();
+  const path = location.pathname.split("/")[2];
+
+  const [filters, setFilters] = React.useState({});
+  const [sort, setSort] = React.useState("newest");
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+          setFilters({
+            ...filters,
+            [e.target.name]: value
+          })
+        }
+        
   return (
     <Container>
       <Navbar />
@@ -42,41 +55,33 @@ function ProductList() {
       <FilterContainer>
         <Filter>
           <FilterText>Filter Products:</FilterText>
-          <Select>
-            <Option disabled selected>
-              Laptop
-            </Option>
-            <Option>Gaming Laptop</Option>
-            <Option>Desktop</Option>
-            <Option>Gaming Desktop</Option>
-            <Option>Monitor</Option>
-            <Option>Tablet</Option>
-            <Option>Phone</Option>
+          <Select name="ram" onChange = {handleChange}>
+            <Option disabled selected>RAM</Option>
+            <Option>2</Option>
+            <Option>4</Option>
+            <Option>8</Option>
+            <Option>16</Option>
+            <Option>32</Option>
+            <Option>64</Option>
           </Select>
-          <Select>
-            <Option disabled selected>
-              Price
-            </Option>
-            <Option>0 - 500</Option>
-            <Option>500 - 1000</Option>
-            <Option>1000 - 2000</Option>
-            <Option>2000 - 3000</Option>
-            <Option>3000 - 4000</Option>
-            <Option>4000 - 5000</Option>
-            <Option>5000 - 6000</Option>
+          <Select name="color" onChange={handleChange}>
+            <Option disabled selected>Color</Option>
+            <Option>black</Option>
+            <Option>white</Option>
+            <Option>gray</Option>
           </Select>
         </Filter>
         <Filter>
           <FilterText>Sort Products:</FilterText>
-          <Select>
-            <Option selected>Newest</Option>
-            <Option>Oldest</Option>
-            <Option>Price</Option>
+          <Select onChange={(e)=>setSort(e.target.value)}>
+            <Option value="newest" selected>Newest</Option>
+            <Option value="oldest" >Oldest</Option>
+            <Option value="price">Price</Option>
           </Select>
         </Filter>
       </FilterContainer>
 
-      <Products />
+      <Products path={path} filters={filters} sort={sort} />
       <Newsletter />
       <Footer />
     </Container>

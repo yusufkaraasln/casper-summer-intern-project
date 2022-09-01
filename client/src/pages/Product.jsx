@@ -1,11 +1,15 @@
 import { Add, Remove } from "@mui/icons-material";
-import React from "react";
+import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
+import { publicRequest } from "../axiosRequest";
 import Announcement from "../components/Announcement";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import Newsletter from "../components/Newsletter";
+import {useDispatch} from 'react-redux'
 
+import {addProduct} from '../redux/cartSlice'
 function Product() {
   const Container = styled.div``;
   const Wrapper = styled.div`
@@ -83,28 +87,70 @@ function Product() {
   `;
 
   const Amount = styled.span`
-        width: 30px;
-        height: 30px;
-        border-radius: 10px;
-        border : 1px solid #242526;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 15px;
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    border: 1px solid #242526;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 15px;
   `;
   const Button = styled.div`
-    
     padding: 15px;
     border: 2px solid #242526;
     background: #fff;
     cursor: pointer;
     font-weight: 500;
 
-    &:hover{
-        background-color: #f8f4f4;
+    &:hover {
+      background-color: #f8f4f4;
     }
-  
   `;
+
+ 
+
+  const location = useLocation();
+  const userID = location.pathname.split("/")[2];
+  const [product, setProduct] = React.useState({});
+  const [colorSelect, setColorSelect] = React.useState("");
+  const [ramSelect, setRamSelect] = React.useState("");
+
+    const dispatch = useDispatch()
+
+
+  useEffect(() => {
+    const getProduct = async () => {
+      const res = await publicRequest.get("/products/one/" + userID);
+      setProduct(res.data);
+    };
+
+    getProduct();
+  }, [userID]);
+
+  const [quantity, setQuantity] = React.useState(1);
+
+  const handleCount = (type) => {
+    if (type === "add") {
+      setQuantity(quantity + 1);
+    } else {
+      if (quantity > 1) {
+        setQuantity(quantity - 1);
+      }
+    }
+  };
+ 
+  const handleClick = () => {
+    dispatch(
+      addProduct({
+        ...product,
+        quantity,
+        color: colorSelect,
+        ram: ramSelect,
+      })
+    );
+  };
+  
 
   return (
     <Container>
@@ -112,39 +158,51 @@ function Product() {
       <Announcement />
       <Wrapper>
         <ImgContainer>
-          <Img src="https://www.casper.com.tr/uploads/2020/09/casper-via-tablet-s38plus-mavi_h270_op.webp" />
+          <Img src={product.img} />
         </ImgContainer>
         <InfoContainer>
-          <Title>Tablet</Title>
-          <Desc>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Eos
-            repellat cumque similique neque. Optio facere eligendi repellendus
-            minima nostrum voluptates.
-          </Desc>
-          <Price>12.000 ₺</Price>
+          <Title>{product.title}</Title>
+          <Desc>{product.desc}</Desc>
+          <Price>{product.price} ₺</Price>
           <FilterContainer>
             <Filter>
               <FilterTitle>Color</FilterTitle>
-              <FilterSeries color="black" />
-              <FilterSeries color="white" />
-              <FilterSeries color="gray" />
+              {product.color?.map((color, index) => (
+                <FilterSeries
+                  color={color}
+                  key={index}
+                  onClick={() => setColorSelect(color)}
+                />
+              ))}
             </Filter>
             <Filter>
               <FilterTitle>RAM</FilterTitle>
-              <FilterRAM>
-                <FilterRAMOption>16GB</FilterRAMOption>
-                <FilterRAMOption>32GB</FilterRAMOption>
-                <FilterRAMOption>64GB</FilterRAMOption>
+              <FilterRAM onChange={(e) => setRamSelect(e.target.value)}>
+                {product.ram?.map((ram, index) => (
+                  <FilterRAMOption
+                  
+                    
+                    key={index}>{ram}</FilterRAMOption>
+                ))}
               </FilterRAM>
             </Filter>
           </FilterContainer>
           <AddContainer>
             <AmountContainer>
-              <Remove style={{cursor: "pointer"}} />
-              <Amount>1</Amount>
-              <Add style={{cursor: "pointer"}} />
+              <Remove
+                onClick={() => handleCount("remove")}
+                style={{ cursor: "pointer" }}
+              />
+              <Amount> {quantity}</Amount>
+              <Add
+                onClick={() => handleCount("add")}
+                style={{ cursor: "pointer" }}
+              />
             </AmountContainer>
-            <Button>Add TO CART</Button>
+            <Button
+            
+                  onClick={handleClick}
+            >Add TO CART</Button>
           </AddContainer>
         </InfoContainer>
       </Wrapper>

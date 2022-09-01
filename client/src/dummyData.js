@@ -41,16 +41,19 @@ export const categories = [
     id: 1,
     img: "https://www.casper.com.tr/uploads/2022/03/casper-nirvana-238-monitor-01_h270_op.webp",
     title: 'CASPER 21.5" MONITOR',
+    cat: "monitor",
   },
   {
     id: 2,
     img: "https://www.casper.com.tr/uploads/2022/06/215-liste-gorseli_h270_op.webp",
     title: 'CASPER 27.5" MONITOR',
+    cat: "monitor",
   },
   {
     id: 3,
     img: "https://www.casper.com.tr/uploads/2020/09/Casper-excalibur-27-inch-gaming-monitor-1_h270_op.webp",
     title: 'CASPER 34" MONITOR',
+    cat: "monitor",
   },
 ];
 

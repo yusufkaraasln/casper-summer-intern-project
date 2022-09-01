@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const OrderSchema = new mongoose.Schema(
   {
     userId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId, //String
+      ref: "User",
       required: true,
     },
     products: [
@@ -24,6 +25,10 @@ const OrderSchema = new mongoose.Schema(
     address: {
       type: Object,
       required: true,
+    },
+    status: {
+      type: String,
+      default: "Beklemede",
     },
   },
   {
